@@ -1,15 +1,18 @@
 package components
 
+import java.util.*
+
 interface Card {
+    val uid: UUID
     val value: String
     val type: String
 
     fun sameType(otherCard: Card): Boolean {
-        return this.type == otherCard.type;
+        return this.type == otherCard.type
     }
 
     fun sameValue(otherCard: Card): Boolean {
-        return this.value == otherCard.value;
+        return this.value == otherCard.value
     }
 }
 
