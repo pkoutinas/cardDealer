@@ -1,7 +1,9 @@
-import statics.decks.*
+
+import statics.games.Uno
 
 fun main() {
-    val unoDeck = getUno()
+    val game = Uno()
 
-    unoDeck.forEach { println(it.toString()) }
+    println("Starting a game of ${game.name}...")
+    println("${game.deck.size} card in the deck")
 }

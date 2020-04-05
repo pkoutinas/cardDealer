@@ -1,16 +1,36 @@
 package components
 
-class Card(val family: String, val value: String) {
+interface Card {
+    val value: String
+    val type: String
 
-    override fun toString(): String {
-        return "$value of $family"
-    }
-
-    fun sameFamily(otherCard: Card): Boolean {
-        return this.family == otherCard.family;
+    fun sameType(otherCard: Card): Boolean {
+        return this.type == otherCard.type;
     }
 
     fun sameValue(otherCard: Card): Boolean {
         return this.value == otherCard.value;
+    }
+}
+
+interface SequentialCard:Card {
+    val loops:Boolean
+    val partOfSequence:Boolean
+    val index:Int
+
+    fun isGreaterThan(otherCard: SequentialCard):Boolean {
+        return this.index > otherCard.index
+    }
+
+    fun isJustGreaterThan(otherCard: SequentialCard):Boolean {
+        return this.index == otherCard.index + 1
+    }
+
+    fun isSmallerThan(otherCard: SequentialCard):Boolean {
+        return this.index < otherCard.index
+    }
+
+    fun isJustSmallerThan(otherCard: SequentialCard):Boolean {
+        return this.index == otherCard.index - 1
     }
 }
