@@ -8,5 +8,6 @@ class Tile(
     val category: String,       // can be draw, discard, both
     val cardTypeRestriction: String?,   // null if no restriction on card type
     val cardValueRestriction: String?,   // null if no restriction on card value
-    val content: MutableList<out Card?>     // Empty list if no cards on tile
-) {}
+    val content: Array<out Card?>     // Empty list if no cards on tile
+) {
+}

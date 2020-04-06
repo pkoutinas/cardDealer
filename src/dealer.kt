@@ -18,6 +18,6 @@ fun main() {
     game.dealRoundZero()
 
 
-    println("Last player was: ${game.getLastPlayerId()}")
+    println("Last player was: ${game.getLatestRound()?.playerId}")
     println("Current player is: ${players.find { p -> p == game.getCurrentPlayer()}?.name }")
 }
