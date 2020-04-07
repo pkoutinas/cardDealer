@@ -29,11 +29,65 @@ class Uno(
     // Game end:
     //  - player has 0 cards in hand
 
-    override var deck: Array<Card> = generateDeck()
+    override var deck: Deck = UnoDeck()
     override val rounds: Stack<Round> = Stack()
     override var playerOrder: Array<Player> = setPlayerOrder(players)
 
-    override fun generateDeck(): Array<Card> {
+    override fun dealRoundZero(): Round {
+        val resultOfDeal: Pair<List<Card>, List<Hand>> = generateInitialHands(deck.cards)
+        // First deal to players
+        val hands: List<Hand> = resultOfDeal.second
+        // Place rest on board
+        val board: Board = UnoBoard(resultOfDeal.first)
+
+        return Round(0, null, board, hands)
+    }
+
+    fun reversePlayerOrder() {
+        playerOrder.reverse()
+    }
+
+    override fun isGameOver(finalRound: Round): Boolean {
+        return true
+    }
+}
+
+class UnoBoard(deckForBoard: List<Card>):Board {
+    override val name: String = "uno"
+    override val tiles: List<Tile> = generateBoard(deckForBoard)
+
+    override fun generateBoard(deckForBoard: List<Card>): List<Tile> {
+        val draw: Pair<Card?, List<Card>> = drawTop(deckForBoard)
+        return listOf(
+            Tile(
+                type = "draw",
+                owner = null,
+                pileType = "overlap",
+                visible = null,
+                category = "draw",
+                content = draw.second,
+                cardTypeRestriction = null,
+                cardValueRestriction = null
+            ),
+            Tile(
+                type = "discard",
+                owner = null,
+                pileType = "overlap",
+                visible = "all",
+                category = "discard",
+                content = if(draw.first == null) listOf() else listOf(draw.first as Card),
+                cardTypeRestriction = null,
+                cardValueRestriction = null
+            )
+        )
+    }
+}
+
+class UnoDeck: Deck {
+    override val name: String = "uno"
+    override val cards: List<Card> = generateDeck()
+
+    override fun generateDeck(): List<Card> {
         val families: Array<String> = arrayOf("Red", "Yellow", "Blue", "Green")
         val cardValues: Array<String> =
             arrayOf("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "Skip", "Reverse", "Draw 2")
@@ -53,41 +107,7 @@ class Uno(
         // Shuffle
         deck.sortBy { it.uid }
 
-        return deck.toTypedArray()
-    }
-
-    override fun generateInitialBoard(deckForBoard: Array<Card>): List<Tile> {
-        val draw: Pair<Card?, Array<Card>> = drawTop(deckForBoard)
-        return listOf(
-            Tile(
-                type = "draw",
-                owner = null,
-                pileType = "overlap",
-                visible = null,
-                category = "draw",
-                content = draw.second,
-                cardTypeRestriction = null,
-                cardValueRestriction = null
-            ),
-            Tile(
-                type = "discard",
-                owner = null,
-                pileType = "overlap",
-                visible = "all",
-                category = "discard",
-                content = arrayOf(draw.first),
-                cardTypeRestriction = null,
-                cardValueRestriction = null
-            )
-        )
-    }
-
-    fun reversePlayerOrder() {
-        playerOrder.reverse()
-    }
-
-    override fun isGameOver(finalRound: Round): Boolean {
-        return true
+        return deck
     }
 }
 

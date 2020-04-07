@@ -2,6 +2,12 @@ package components
 
 import java.util.*
 
+interface Deck {
+    val name:String
+    val cards:List<Card>
+    fun generateDeck(): List<Card>
+}
+
 interface Card {
     val uid: UUID
     val value: String
