@@ -37,7 +37,7 @@ interface Board {
 }
 
 data class Tile(
-    val type: String,           // This will be game specific
+    val name: String,           // This will be game specific
     val owner: String?,         // null for communal tiles
     val pileType: String,       // can be single/overlap/cascade
     val visible: String?,       // can be null (for no) / top / all

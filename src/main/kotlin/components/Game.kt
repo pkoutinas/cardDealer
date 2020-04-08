@@ -29,7 +29,10 @@ interface Game {
      */
     val properties: Map<String, Any>
 
-    val rules: Any?             // TODO: how?
+    /**
+     * List of rules applicable to this [Game] type.
+     */
+    val rules: RuleSet
 
     /**
      * [MutableList] containing all the [Round]s that have already taken place.
@@ -46,9 +49,9 @@ interface Game {
     }
 
     /**
-     * Sets the default playing order based on the [players] provided.
+     * Sets the default playing order based on the [candidates] provided.
      * Default implementation returns the same as the input parameter.
-     * @param [players] is an [Array] of [Player]s to be used in this game.
+     * @param [candidates] is an [Array] of [Player]s to be used in this game.
      * @return [Array] of [Player]s in the order of play.
      */
     fun setPlayerOrder(candidates: List<Player>): Array<Player> {

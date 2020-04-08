@@ -1,6 +1,7 @@
-
 import components.Player
+import components.Rule
 import statics.games.Uno
+import kotlin.reflect.typeOf
 
 @ExperimentalStdlibApi
 fun main() {
@@ -16,13 +17,10 @@ fun main() {
 
     // When ready, start by dealing round 0
     println("Let's start!")
-    if(game.canStartGame(players)){
+    if (game.canStartGame(players)) {
         game.dealRoundZero(players)
 
         println("Last player was: ${game.getLatestRound()?.playerId}")
-        println("Current player is: ${players.find { p -> p == game.getCurrentPlayer()}?.name }")
+        println("Current player is: ${players.find { p -> p == game.getCurrentPlayer() }?.name}")
     }
-
-
-
 }

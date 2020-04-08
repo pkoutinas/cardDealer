@@ -20,6 +20,7 @@ class UnoTest : FunSpec({
         game.name shouldBe "uno"
         game.deck.name shouldBe "uno"
         startBoard.name shouldBe "uno"
+        game.rules.name shouldBe "uno"
     }
     test("Uno deck has 112 cards") {
         game.deck.cards.size shouldBe 112
@@ -38,17 +39,23 @@ class UnoTest : FunSpec({
         (candidates.toTypedArray().contentEquals(game.playerOrder)) shouldBe true
         (candidates.toTypedArray().contentEquals(game.setPlayerOrder(candidates))) shouldBe true
     }
-    test("Uno board has exactly 2 tiles") {
-        startBoard.tiles.size shouldBe 2
+    test("Uno board has exactly 3 tiles") {
+        startBoard.tiles.size shouldBe 3
     }
     test("Uno board has exactly one 'draw' tile") {
-        startBoard.tiles.filter { t -> t.type == "draw" }.size shouldBe 1
+        startBoard.tiles.filter { t -> t.name == "draw" }.size shouldBe 1
     }
     test("Uno board has exactly one 'discard' tile") {
-        startBoard.tiles.filter { t -> t.type == "discard" }.size shouldBe 1
+        startBoard.tiles.filter { t -> t.name == "discard" }.size shouldBe 1
+    }
+    test("Uno board has exactly one 'plus' tile") {
+        startBoard.tiles.filter { t -> t.name == "plus" }.size shouldBe 1
     }
     test("The 'discard' tile has exactly 1 card") {
-        startBoard.tiles.find { t -> t.type == "discard" }!!.content.size shouldBe 1
+        startBoard.tiles.find { t -> t.name == "discard" }!!.content.size shouldBe 1
+    }
+    test("The 'plus' tile is empty") {
+        startBoard.tiles.find { t -> t.name == "plus" }!!.content.size shouldBe 0
     }
     test("Entire deck is either on the board or in hands") {
         roundZero.hands.fold(0, { total, hand -> total + hand.cards.size }) + startBoard.tiles.fold(
