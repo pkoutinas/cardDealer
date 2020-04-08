@@ -2,16 +2,18 @@ package statics.games
 
 import components.*
 import java.util.*
+import kotlin.reflect.typeOf
 
 
-class Uno(
-    override val players: Array<Player>
-) : Game {
-    override val name: String = "Uno"
-    override val minPlayers: Int = 2
-    override val maxPlayers: Int = 8
-    override val startHand: Int = 7
-    override val roundType: String = "sequential"
+@ExperimentalStdlibApi
+class Uno : Game {
+    override val name: String = "uno"
+    override val properties: Map<String, Any> = mapOf(
+        Pair("minPlayers", 2),
+        Pair("maxPlayers", 8),
+        Pair("startHand", 7),
+        Pair("roundType", "sequential")
+    )
     override val rules: Any? = null
     // shedding game
     // can only shed to 'discard' tile
@@ -31,28 +33,36 @@ class Uno(
 
     override var deck: Deck = UnoDeck()
     override val rounds: Stack<Round> = Stack()
-    override var playerOrder: Array<Player> = setPlayerOrder(players)
+    override lateinit var playerOrder: Array<Player>
 
-    override fun dealRoundZero(): Round {
+    override fun dealRoundZero(candidates: List<Player>): Round {
+        //First set the player order
+        playerOrder = setPlayerOrder(candidates)
+
         val resultOfDeal: Pair<List<Card>, List<Hand>> = generateInitialHands(deck.cards)
-        // First deal to players
+        // Then deal to players
         val hands: List<Hand> = resultOfDeal.second
-        // Place rest on board
+
+        // Finally place rest of deck on board
         val board: Board = UnoBoard(resultOfDeal.first)
 
         return Round(0, null, board, hands)
     }
 
+    override fun endTurn(newBoard: Board, newHands: List<Hand>): Round? {
+        val newRound = Round((getLatestRound()?.index ?:-1) + 1, getCurrentPlayer().id, newBoard, newHands)
+        if (true) {
+            return null
+        }
+        return newRound
+    }
+
     fun reversePlayerOrder() {
         playerOrder.reverse()
     }
-
-    override fun isGameOver(finalRound: Round): Boolean {
-        return true
-    }
 }
 
-class UnoBoard(deckForBoard: List<Card>):Board {
+class UnoBoard(deckForBoard: List<Card>) : Board {
     override val name: String = "uno"
     override val tiles: List<Tile> = generateBoard(deckForBoard)
 
@@ -75,7 +85,7 @@ class UnoBoard(deckForBoard: List<Card>):Board {
                 pileType = "overlap",
                 visible = "all",
                 category = "discard",
-                content = if(draw.first == null) listOf() else listOf(draw.first as Card),
+                content = if (draw.first == null) listOf() else listOf(draw.first as Card),
                 cardTypeRestriction = null,
                 cardValueRestriction = null
             )
@@ -83,7 +93,7 @@ class UnoBoard(deckForBoard: List<Card>):Board {
     }
 }
 
-class UnoDeck: Deck {
+class UnoDeck : Deck {
     override val name: String = "uno"
     override val cards: List<Card> = generateDeck()
 

@@ -6,10 +6,6 @@ import java.util.UUID
  * [Game] interface has to be overridden for every game type
  */
 interface Game {
-    /**
-     * [Array] of all [Player]s added to the game, in order of joining the session.
-     */
-    val players: Array<Player>
 
     /**
      * [Array] of [Player]s in order of play.
@@ -24,27 +20,16 @@ interface Game {
     /**
      * [Deck] to be used in this session.
      */
-    var deck: Deck
+    val deck: Deck
 
     /**
-     * Minimum number of players required to start a game (inclusive).
+     * List of core properties applicable to this [Game] type, structured as a [Map] where the key is the property name as
+     * a [String] and the value is the property value in any primitive type.
+     * Must always include minPlayers (int), maxPlayers (int), startingHand (int), roundType (String).
      */
-    val minPlayers: Int
+    val properties: Map<String, Any>
 
-    /**
-     * Maximum number of players required to start a game (inclusive).
-     */
-    val maxPlayers: Int
-
-    /**
-     * Number of cards each player will receive at the beginning of the game.
-     */
-    val startHand: Int
-
-    /**
-     * Describes how game rounds are taking place. Possible values are: sequential, simultaneous and reflex.
-     */
-    val roundType: String
+    val rules: Any?             // TODO: how?
 
     /**
      * [MutableList] containing all the [Round]s that have already taken place.
@@ -52,7 +37,13 @@ interface Game {
      */
     val rounds: MutableList<Round>
 
-    val rules: Any?             // TODO: how?
+    /**
+     * Checks if the game settings meet the minimum starting properties
+     * @return [Boolean]
+     */
+    fun canStartGame(candidates: List<Player>): Boolean {
+        return (candidates.size >= properties["minPlayers"] as Int && candidates.size <= properties["maxPlayers"] as Int )
+    }
 
     /**
      * Sets the default playing order based on the [players] provided.
@@ -60,17 +51,18 @@ interface Game {
      * @param [players] is an [Array] of [Player]s to be used in this game.
      * @return [Array] of [Player]s in the order of play.
      */
-    fun setPlayerOrder(players: Array<Player>): Array<Player> {
-        return players
+    fun setPlayerOrder(candidates: List<Player>): Array<Player> {
+        return candidates.toTypedArray()
     }
 
     /**
      * Used to start the game by dealing the appropriate [Card]s to the [Player]s via [generateInitialHands]
      * and then setting up the board with the remaining [Card]s. Must be overridden.
      * This results in a new starting [Round] being returned.
+     * @param [candidates] is the [List] of [Player]s to be added to this game
      * @return [Round] with [Round.index] = 0 and [Round.playerId] = null, along with the newly created board and hands
      */
-    fun dealRoundZero(): Round
+    fun dealRoundZero(candidates: List<Player>): Round
 
     /**
      * Distributes the appropriate [Card]s to all [Player]s by order of play and returns the remaining deck and a
@@ -86,7 +78,7 @@ interface Game {
 
         for (i in playerOrder.indices) {
             val parts: Pair<List<Card>, List<Card>> =
-                remainingDeck.partition { card -> remainingDeck.indexOf(card) < startHand }
+                remainingDeck.partition { card -> remainingDeck.indexOf(card) < properties["startHand"] as Int }
             hands.add(Hand(playerOrder[i], parts.first))
             remainingDeck = parts.second
         }
@@ -116,28 +108,12 @@ interface Game {
     }
 
     /**
-     *  Triggers the end of a turn by performing the following actions:
-     *   - Check if the game end conditions have been met by calling [isGameOver]
-     *   - If the game is over, return null otherwise return the completed [Round]
-     *  Note that [endTurn] does not check for the board or hand correctness.
+     *  Triggers the end of a turn by storing the last completed [Round].
      *  @param [newBoard] is the validated [Board] following the current's player's moves.
      *  @param [newHands] is a [List] of [Hand]s as created by [generateInitialHands] and stored in [rounds].
      *  @return Next [Player] that is due to play or null if the game is over
      */
-    fun endTurn(newBoard: Board, newHands: List<Hand>): Round? {
-        val newRound = Round((getLatestRound()?.index ?:-1) + 1, getCurrentPlayer().id, newBoard, newHands)
-        if (isGameOver(newRound)) {
-            return null
-        }
-        return newRound
-    }
-
-    /**
-     * Checks if the [finalRound] provided satisfies the [Game]'s end conditions (must be overridden).
-     * @param [finalRound] is the [Round] to be checked
-     * @return [Boolean] returned is true if the conditions are met, false if they are not.
-     */
-    fun isGameOver(finalRound: Round): Boolean
+    fun endTurn(newBoard: Board, newHands: List<Hand>): Round?
 }
 
 data class Round(

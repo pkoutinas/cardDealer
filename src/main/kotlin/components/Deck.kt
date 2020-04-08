@@ -22,6 +22,7 @@ interface Card {
     }
 }
 
+// TODO: Add test cases
 interface SequentialCard:Card {
     val loops:Boolean
     val partOfSequence:Boolean
